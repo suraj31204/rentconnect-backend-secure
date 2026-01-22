@@ -1,34 +1,28 @@
-const OpenAI = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 exports.chatBotReply = async (req, res) => {
   const { message } = req.body;
 
   if (!message) {
-    return res.status(400).json({ error: "Message is required" });
+    return res.status(400).json({ reply: "Message is required" });
   }
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful assistant for RentConnect car rental platform.",
-        },
-        { role: "user", content: message },
-      ],
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    res.json({
-      reply: response.choices[0].message.content,
-    });
+    const result = await model.generateContent(
+      `You are a helpful assistant for the RentConnect car rental platform.\nUser: ${message}`
+    );
+
+    const reply = result.response.text();
+
+    res.json({ reply });
   } catch (error) {
-    console.error("Chatbot error:", error.message);
-    res.status(500).json({ error: "Chatbot failed" });
+    console.error("Gemini error:", error.message);
+    res.json({
+      reply: "⚠️ Chatbot is temporarily unavailable. Please try again later.",
+    });
   }
 };
