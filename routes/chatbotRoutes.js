@@ -1,5 +1,5 @@
 const express = require("express");
-const { chatBotReply } = require("../controller/chatbotController");
+const { chatBotReply } = require("../controller/chatbotController"); // ✅ singular
 
 const router = express.Router();
 
