@@ -1,19 +1,26 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-exports.chatBotReply = async (req, res) => {
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+export const chatWithBot = async (req, res) => {
   try {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ reply: "Message is required" });
+    }
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash", // ✅ CORRECT MODEL
+      model: "gemini-1.5-flash-latest",
     });
 
-    const result = await model.generateContent(req.body.message);
+    const result = await model.generateContent(message);
     const reply = result.response.text();
 
     res.json({ reply });
   } catch (error) {
-    console.error("Gemini backend error:", error.message);
+    console.error("Gemini error:", error.message);
+
     res.json({
       reply: "⚠️ Chatbot is temporarily unavailable. Please try again later.",
     });
