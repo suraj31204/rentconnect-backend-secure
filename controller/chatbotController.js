@@ -1,8 +1,8 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export const chatWithBot = async (req, res) => {
+const chatHandler = async (req, res) => {
   try {
     const { message } = req.body;
 
@@ -11,7 +11,7 @@ export const chatWithBot = async (req, res) => {
     }
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-latest",
+      model: "models/gemini-1.5-flash", // ✅ correct model
     });
 
     const result = await model.generateContent(message);
@@ -26,3 +26,5 @@ export const chatWithBot = async (req, res) => {
     });
   }
 };
+
+module.exports = { chatHandler };

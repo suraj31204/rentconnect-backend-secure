@@ -5,4 +5,4 @@ const router = express.Router();
 
 router.post("/chat", chatHandler);
 
-export default router;
+module.exports = router;
