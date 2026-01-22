@@ -8,38 +8,46 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
-const chatbotRoutes = require("./routes/chatbotRoutes");
-
 
 // Env
 require("dotenv").config();
 
-// Local Modules
+// Routes
+const chatbotRoutes = require("./routes/chatbotRoutes");
 const carRouter = require("./routes/carInfoRouter");
 const driverRouter = require("./routes/driverInfoRouter");
 const authRouter = require("./routes/authRouter");
 const carRequestRouter = require("./routes/carRequestRouter");
+const paymentRoutes = require("./routes/paymentRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
 // 🔥 REQUIRED FOR RENDER
-const PORT = process.env.PORT || 2000;
+const PORT = process.env.PORT || 10000;
 const DB_URL = process.env.MONGO_URI;
 
-// Middleware
+// --------------------
+// ✅ MIDDLEWARE
+// --------------------
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// ✅ CORS (LOCAL + VERCEL FRONTEND)
-app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://rentconnect-frontend.vercel.app"
-  ],
-  credentials: true
-}));
+// ✅ CORS (VERY IMPORTANT – FIXED)
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://rentconnect-frontend.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
 
-// Session Store
+// --------------------
+// ✅ SESSION STORE
+// --------------------
 const store = new MongoDBStore({
   uri: DB_URL,
   collection: "sessions",
@@ -50,7 +58,7 @@ app.use(
     secret: process.env.SESSION_SECRET || "mySecretKey",
     resave: false,
     saveUninitialized: false,
-    store: store,
+    store,
     cookie: {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -60,37 +68,38 @@ app.use(
   })
 );
 
-// Static Files
+// --------------------
+// ✅ STATIC FILES
+// --------------------
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(
   "/uploadsDrivers",
   express.static(path.join(__dirname, "uploadsDrivers"))
 );
 
-// Routes
+// --------------------
+// ✅ ROUTES
+// --------------------
 app.use("/api/carInfo", carRouter);
 app.use("/api/driver", driverRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/carRequest", carRequestRouter);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/admin", adminRoutes);
 
-// Banking
-app.use("/api/payment", require("./routes/paymentRoutes"));
-
-// Admin
-app.use("/api/admin", require("./routes/adminRoutes"));
-
-// Chatbot
+// ✅ CHATBOT ROUTE (IMPORTANT)
 app.use("/api", chatbotRoutes);
 
-
-// DB + Server Start
+// --------------------
+// ✅ DB + SERVER
+// --------------------
 mongoose
   .connect(DB_URL)
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`✅ Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("MongoDB connection failed:", err);
+    console.error("❌ MongoDB connection failed:", err);
   });
