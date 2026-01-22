@@ -1,8 +1,12 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+if (!process.env.GEMINI_API_KEY) {
+  console.error("❌ GEMINI_API_KEY is missing");
+}
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const chatWithBot = async (req, res) => {
+exports.chatHandler = async (req, res) => {
   try {
     const { message } = req.body;
 
@@ -11,7 +15,7 @@ const chatWithBot = async (req, res) => {
     }
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash", // WORKING MODEL
+      model: "gemini-1.5-flash-latest",
     });
 
     const result = await model.generateContent(message);
@@ -19,11 +23,10 @@ const chatWithBot = async (req, res) => {
 
     res.json({ reply });
   } catch (error) {
-    console.error("Gemini error:", error.message);
+    console.error("Gemini error:", error);
+
     res.status(500).json({
       reply: "⚠️ Chatbot is temporarily unavailable. Please try again later.",
     });
   }
 };
-
-module.exports = { chatWithBot };
