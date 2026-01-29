@@ -3,6 +3,6 @@ const { chatWithBot } = require("../controller/chatbotController");
 
 const router = express.Router();
 
-router.post("/chat", chatWithBot); // ✅ function exists
+router.post("/chat", chatWithBot);
 
 module.exports = router;

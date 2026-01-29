@@ -14,20 +14,15 @@ const chatWithBot = async (req, res) => {
 
     const completion = await groq.chat.completions.create({
       model: "llama3-8b-8192",
-      messages: [
-        {
-          role: "user",
-          content: message,
-        },
-      ],
+      messages: [{ role: "user", content: message }],
     });
 
-    return res.json({
+    res.json({
       reply: completion.choices[0].message.content,
     });
   } catch (error) {
     console.error("Groq error:", error);
-    return res.status(500).json({
+    res.status(500).json({
       reply: "⚠️ Chatbot is temporarily unavailable. Please try again later.",
     });
   }
