@@ -1,32 +1,32 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const Groq = require("groq-sdk");
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 const chatWithBot = async (req, res) => {
   try {
-    console.log("🟢 /api/chat hit");
-    console.log("🔑 GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "FOUND" : "MISSING");
-
     const { message } = req.body;
-    console.log("📩 Message:", message);
 
     if (!message) {
       return res.status(400).json({ reply: "Message is required" });
     }
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-pro",
+    const completion = await groq.chat.completions.create({
+      model: "llama3-8b-8192",
+      messages: [
+        {
+          role: "user",
+          content: message,
+        },
+      ],
     });
 
-    const result = await model.generateContent(message);
-    const reply = result.response.text();
-
-    console.log("🤖 Reply:", reply);
-
-    return res.json({ reply });
+    return res.json({
+      reply: completion.choices[0].message.content,
+    });
   } catch (error) {
-    console.error("❌ Gemini FULL error:", error);
-
+    console.error("Groq error:", error);
     return res.status(500).json({
       reply: "⚠️ Chatbot is temporarily unavailable. Please try again later.",
     });
