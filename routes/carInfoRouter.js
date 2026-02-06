@@ -15,4 +15,8 @@ router.get("/", carController.getAllCars);
 /* ✅ NEW – GET CARS BY OWNER */
 router.get("/owner/:ownerId", carController.getCarsByOwner);
 
+router.put("/:id", carController.updateCar);
+router.delete("/:id", carController.deleteCar);
+router.get("/:id", carController.getCarById);
+
 module.exports = router;

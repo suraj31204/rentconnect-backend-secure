@@ -62,3 +62,36 @@ exports.getCarsByOwner = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch owner cars" });
   }
 };
+
+
+exports.updateCar = async (req, res) => {
+  try {
+    const updatedCar = await Car.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updatedCar);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update car" });
+  }
+};
+
+exports.deleteCar = async (req, res) => {
+  try {
+    await Car.findByIdAndDelete(req.params.id);
+    res.json({ message: "Car deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete car" });
+  }
+};
+
+
+exports.getCarById = async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.id);
+    res.json(car);
+  } catch (err) {
+    res.status(404).json({ error: "Car not found" });
+  }
+};
