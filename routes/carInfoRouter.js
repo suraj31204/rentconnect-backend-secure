@@ -10,13 +10,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post("/", upload.array("carImages", 10), carController.carInfoHandler);
-router.get("/", carController.getAllCars);
 
-/* ✅ NEW – GET CARS BY OWNER */
+/* ✅ GET BY ID MUST COME FIRST */
+router.get("/:id", carController.getCarById);
+
+/* ✅ THEN OWNER */
 router.get("/owner/:ownerId", carController.getCarsByOwner);
+
+/* ALL */
+router.get("/", carController.getAllCars);
 
 router.put("/:id", carController.updateCar);
 router.delete("/:id", carController.deleteCar);
-router.get("/:id", carController.getCarById);
 
 module.exports = router;

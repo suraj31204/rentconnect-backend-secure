@@ -22,6 +22,7 @@ authRouter.get("/user", (req, res) => {
   }
 });
 
+authRouter.put("/user/:id", handleAuthController.updateUser);
 
 
 module.exports = authRouter;

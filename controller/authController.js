@@ -91,3 +91,25 @@ exports.postSignUp = [
     res.json({ success: true });
   }
 ];
+
+
+
+exports.updateUser = async (req, res) => {
+  try {
+    const { firstName, lastName, email } = req.body;
+
+    const updated = await User.findByIdAndUpdate(
+      req.params.id,
+      { firstName, lastName, email },
+      { new: true }
+    );
+
+    // update session user also
+    req.session.user = updated;
+    await req.session.save();
+
+    res.json({ success: true, user: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Update failed" });
+  }
+};
