@@ -51,3 +51,14 @@ exports.getAllCars = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch cars" });
   }
 };
+
+
+exports.getCarsByOwner = async (req, res) => {
+  try {
+    const cars = await Car.find({ owner: req.params.ownerId });
+    res.status(200).json(cars);
+  } catch (error) {
+    console.error("Error fetching owner cars:", error);
+    res.status(500).json({ error: "Failed to fetch owner cars" });
+  }
+};

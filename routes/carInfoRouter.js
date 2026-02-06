@@ -12,4 +12,7 @@ const upload = multer({ storage });
 router.post("/", upload.array("carImages", 10), carController.carInfoHandler);
 router.get("/", carController.getAllCars);
 
+/* ✅ NEW – GET CARS BY OWNER */
+router.get("/owner/:ownerId", carController.getCarsByOwner);
+
 module.exports = router;
