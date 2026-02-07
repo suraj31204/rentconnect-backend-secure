@@ -1,43 +1,82 @@
-const Driver = require('../model/driverInfoModel');
+const Driver = require("../model/driverInfoModel");
 
-exports.driverInfoHandler = (req,res,next) => {
-   // Prefer session user id; if not present (e.g., client-only flow), accept driverId from the multipart form body.
-   const sessionUserId = req.session && req.session.user && req.session.user._id;
-   const clientDriverId = req.body && req.body.driverId;
-   const driverIdToUse = sessionUserId || clientDriverId || null;
+/* ================= CREATE ================= */
+exports.driverInfoHandler = async (req, res) => {
+  try {
+    const sessionUserId = req.session?.user?._id;
+    if (!sessionUserId) {
+      return res.status(401).json({ error: "Login required" });
+    }
 
-   if (!driverIdToUse) {
-      return res.status(401).json({ error: 'Authentication required to create driver profile (no driverId in session or request)' });
-   }
-
-   console.log('driverInfoHandler: using driverId =', driverIdToUse, ' (from', sessionUserId ? 'session' : 'client', ')');
-
-   const newDriver = new Driver({
-      driverId: driverIdToUse,
+    const newDriver = new Driver({
+      driverId: sessionUserId,
       name: req.body.fullName || req.body.name,
-      email: req.body.email,  
+      email: req.body.email,
       address: req.body.address,
       license: req.body.license,
       idProof: req.body.idProof,
-      idProofImage: req.files && req.files['idProofImage'] ? req.files['idProofImage'][0].filename : '',
+      idProofImage: req.files?.idProofImage
+        ? `uploadsDrivers/${req.files.idProofImage[0].filename}`
+        : "",
       experience: req.body.experience,
       previousWork: req.body.previousWork,
       preferredRoutes: req.body.preferredRoutes,
       emergencyContact: req.body.emergencyContact,
-      photo: req.files && req.files['photo'] ? req.files['photo'][0].filename : ''
-   });
+      photo: req.files?.photo
+        ? `uploadsDrivers/${req.files.photo[0].filename}`
+        : "",
+    });
 
-   newDriver.save()
-   .then(driver => res.status(201).json(driver))
-   .catch(err => res.status(400).json({ error: err.message }));
-}
+    const saved = await newDriver.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
 
+/* ================= GET ALL ================= */
+exports.getAllDrivers = async (req, res) => {
+  const driversData = await Driver.find();
+  res.status(200).json(driversData);
+};
 
+/* ================= GET BY USER ================= */
+exports.getDriverByUser = async (req, res) => {
+  try {
+    const driver = await Driver.findOne({ driverId: req.params.userId });
 
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
 
+    res.json(driver);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
+/* ================= UPDATE ================= */
+exports.updateDriver = async (req, res) => {
+  try {
+    const updateData = { ...req.body };
 
-exports.getAllDrivers = async (req,res,next) => {
-   const driversData = await Driver.find();
-   res.status(200).json(driversData);
-}
+    if (req.files?.photo) {
+      updateData.photo = `uploadsDrivers/${req.files.photo[0].filename}`;
+    }
+
+    if (req.files?.idProofImage) {
+      updateData.idProofImage = `uploadsDrivers/${req.files.idProofImage[0].filename}`;
+    }
+
+    const updated = await Driver.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Update failed" });
+  }
+};
