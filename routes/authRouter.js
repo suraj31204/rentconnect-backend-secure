@@ -16,11 +16,18 @@ authRouter.post('/logout', handleAuthController.postLogout);
 // Check if user is still logged in
 authRouter.get("/user", (req, res) => {
   if (req.session.user) {
-    res.json({ loggedIn: true, user: req.session.user });
+    res.json({
+      isLoggedIn: true,
+      user: req.session.user,
+    });
   } else {
-    res.json({ loggedIn: false });
+    res.json({
+      isLoggedIn: false,
+      user: null,
+    });
   }
 });
+
 
 authRouter.put("/user/:id", handleAuthController.updateUser);
 

@@ -23,6 +23,9 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
+/* 🔥 ADD THIS */
+app.set("trust proxy", 1);
+
 // 🔥 REQUIRED FOR RENDER
 const PORT = process.env.PORT || 10000;
 const DB_URL = process.env.MONGO_URI;
