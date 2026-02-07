@@ -1,9 +1,12 @@
 const Driver = require("../model/driverInfoModel");
 
-/* ================= CREATE ================= */
+/* ======================================================
+   CREATE DRIVER PROFILE
+   ====================================================== */
 exports.driverInfoHandler = async (req, res) => {
   try {
     const sessionUserId = req.session?.user?._id;
+
     if (!sessionUserId) {
       return res.status(401).json({ error: "Login required" });
     }
@@ -15,32 +18,44 @@ exports.driverInfoHandler = async (req, res) => {
       address: req.body.address,
       license: req.body.license,
       idProof: req.body.idProof,
-      idProofImage: req.files?.idProofImage
-        ? `uploadsDrivers/${req.files.idProofImage[0].filename}`
-        : "",
       experience: req.body.experience,
       previousWork: req.body.previousWork,
       preferredRoutes: req.body.preferredRoutes,
       emergencyContact: req.body.emergencyContact,
+
+      // 🔥 SAVE FULL PATH
       photo: req.files?.photo
         ? `uploadsDrivers/${req.files.photo[0].filename}`
+        : "",
+
+      idProofImage: req.files?.idProofImage
+        ? `uploadsDrivers/${req.files.idProofImage[0].filename}`
         : "",
     });
 
     const saved = await newDriver.save();
     res.status(201).json(saved);
   } catch (err) {
+    console.error(err);
     res.status(400).json({ error: err.message });
   }
 };
 
-/* ================= GET ALL ================= */
+/* ======================================================
+   GET ALL
+   ====================================================== */
 exports.getAllDrivers = async (req, res) => {
-  const driversData = await Driver.find();
-  res.status(200).json(driversData);
+  try {
+    const drivers = await Driver.find();
+    res.status(200).json(drivers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-/* ================= GET BY USER ================= */
+/* ======================================================
+   GET BY USER
+   ====================================================== */
 exports.getDriverByUser = async (req, res) => {
   try {
     const driver = await Driver.findOne({ driverId: req.params.userId });
@@ -55,15 +70,19 @@ exports.getDriverByUser = async (req, res) => {
   }
 };
 
-/* ================= UPDATE ================= */
+/* ======================================================
+   UPDATE DRIVER
+   ====================================================== */
 exports.updateDriver = async (req, res) => {
   try {
     const updateData = { ...req.body };
 
+    // if new photo uploaded
     if (req.files?.photo) {
       updateData.photo = `uploadsDrivers/${req.files.photo[0].filename}`;
     }
 
+    // if new id proof uploaded
     if (req.files?.idProofImage) {
       updateData.idProofImage = `uploadsDrivers/${req.files.idProofImage[0].filename}`;
     }

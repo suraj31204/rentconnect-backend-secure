@@ -1,9 +1,11 @@
 const express = require("express");
 const Router = express.Router();
 const multer = require("multer");
-const Driver = require("../model/driverInfoModel");
 const driverController = require("../controller/driverInfoController");
 
+/* ======================================================
+   MULTER CONFIG
+   ====================================================== */
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploadsDrivers/");
@@ -15,7 +17,9 @@ const storage = multer.diskStorage({
 
 const uploadsDriver = multer({ storage });
 
-/* CREATE DRIVER PROFILE */
+/* ======================================================
+   CREATE
+   ====================================================== */
 Router.post(
   "/",
   uploadsDriver.fields([
@@ -25,13 +29,19 @@ Router.post(
   driverController.driverInfoHandler
 );
 
-/* GET ALL DRIVERS */
+/* ======================================================
+   GET ALL
+   ====================================================== */
 Router.get("/", driverController.getAllDrivers);
 
-/* GET DRIVER BY USER */
+/* ======================================================
+   GET BY USER
+   ====================================================== */
 Router.get("/by-user/:userId", driverController.getDriverByUser);
 
-/* 🔥 UPDATE DRIVER */
+/* ======================================================
+   UPDATE
+   ====================================================== */
 Router.put(
   "/update/:id",
   uploadsDriver.fields([
