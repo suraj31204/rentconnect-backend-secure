@@ -24,10 +24,17 @@ exports.carInfoHandler = async (req, res) => {
       seatCapacity,
       registrationDate,
       carColour,
-      carLocation, // ✅ ADDED
+      carLocation,
       carImages: req.files.map(file => `uploads/${file.filename}`),
       price_per_day,
-      price_per_month
+      price_per_month,
+
+      bankDetails: {
+        accountHolderName: req.body["bankDetails[accountHolderName]"],
+        accountNumber: req.body["bankDetails[accountNumber]"],
+        ifsc: req.body["bankDetails[ifsc]"],
+        bankName: req.body["bankDetails[bankName]"]
+      }
     });
 
     await newCar.save();

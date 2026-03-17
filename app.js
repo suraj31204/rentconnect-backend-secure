@@ -75,10 +75,8 @@ app.use(
 // ✅ STATIC FILES
 // --------------------
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use(
-  "/uploadsDrivers",
-  express.static(path.join(__dirname, "uploadsDrivers"))
-);
+app.use("/uploadsDrivers", express.static("uploadsDrivers"));
+
 
 // --------------------
 // ✅ ROUTES
