@@ -29,12 +29,12 @@ exports.carInfoHandler = async (req, res) => {
       price_per_day,
       price_per_month,
 
-      bankDetails: {
-        accountHolderName: req.body["bankDetails[accountHolderName]"],
-        accountNumber: req.body["bankDetails[accountNumber]"],
-        ifsc: req.body["bankDetails[ifsc]"],
-        bankName: req.body["bankDetails[bankName]"]
-      }
+bankDetails: {
+  accountHolderName: req.body.accountHolderName,
+  accountNumber: req.body.accountNumber,
+  ifsc: req.body.ifsc,
+  bankName: req.body.bankName
+}
     });
 
     await newCar.save();
